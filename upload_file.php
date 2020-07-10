@@ -1,38 +1,53 @@
 <!DOCTYPE html>
 <html>
 <body>
+<?php 
+  include 'class.pdf2text.php';
 
-<?php
+  $targetfolder = "testupload/";
 
+ $targetfolder = $targetfolder . basename( $_FILES['file']['name']) ;
 
-
-$file_type=$_FILES['file']['type'];
-
- 	$filename = basename( $_FILES['file']['name']);
-	$md5file = md5($filename);
-
-if ($file_type=="application/pdf" || $file_type=="image/gif" || $file_type=="image/jpeg") {
-
-	if ("f27de7615d7333cb2f807a83087ddb23" == $md5file)
-  {
-  echo "The file is ok.";
-  }
-else
-  {
-  echo "The file is not ok.";
-  }
-}
-
-else {
-
- echo "You may only upload PDFs, JPEGs or GIF files.<br>";
-
-}
+ $ok=1;
 
 
+  $file_type = $_FILES['file']['type'];
 
+  
 
- ?>
+  if ($file_type=="application/pdf") {
 
-</body>
-</html>
+    if(move_uploaded_file($_FILES['file']['tmp_name'], $targetfolder))
+
+    {
+        $filename = basename( $_FILES['file']['name']);
+
+        // echo $filename;  
+        $a = new PDF2Text();
+        $a->setFilename($filename); 
+        $a->decodePDF();
+      
+        $md5file = md5($a->output());
+  
+  	     if ("a0b6077debc0454a91afe5f94a118f25" == $md5file)
+          {
+          //  header('Location: ' . "index.php?ref=valid", true, false ? 301 : 302);
+          //        exit();
+            echo '<script type="text/javascript">window.location="index.php?ref=valid"</script>';
+           /*echo "file is ok";*/
+      
+          }
+          else
+          {
+            echo '<script type="text/javascript">window.location="index.php?ref=invalid"</script>';
+           /* echo "file is not ok";*/
+          }
+      }
+
+    }
+  
+  else {
+  
+   echo "You may only upload PDFs files.<br>";
+  
+  } 
